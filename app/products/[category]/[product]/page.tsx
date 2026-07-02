@@ -7,11 +7,21 @@ import { ProductCard } from "@/components/products/product-card"
 import { ProductGallery } from "@/components/products/product-gallery"
 import { Reveal, StaggerGroup } from "@/components/motion/reveal"
 import { Button } from "@/components/ui/button"
-import { products, getProduct, getCategory, getProductsByCategory } from "@/lib/products"
+import {
+  fetchCategories,
+  fetchProducts,
+  findCategory,
+  findProduct,
+  filterProductsByCategory,
+} from "@/lib/products-db"
 import { site } from "@/lib/site"
 
-export function generateStaticParams() {
-  return products.map((p) => ({ category: p.category, product: p.slug }))
+export const revalidate = 60
+export const dynamicParams = true
+
+export async function generateStaticParams() {
+  const prods = await fetchProducts()
+  return prods.map((p) => ({ category: p.category, product: p.slug }))
 }
 
 export async function generateMetadata({
@@ -20,7 +30,8 @@ export async function generateMetadata({
   params: Promise<{ category: string; product: string }>
 }): Promise<Metadata> {
   const { product } = await params
-  const p = getProduct(product)
+  const prods = await fetchProducts()
+  const p = findProduct(prods, product)
   if (!p) return {}
   return {
     title: p.name,
@@ -35,11 +46,12 @@ export default async function ProductDetailPage({
   params: Promise<{ category: string; product: string }>
 }) {
   const { category, product } = await params
-  const p = getProduct(product)
-  const cat = getCategory(category)
+  const [categories, products] = await Promise.all([fetchCategories(), fetchProducts()])
+  const p = findProduct(products, product)
+  const cat = findCategory(categories, category)
   if (!p || !cat || p.category !== category) notFound()
 
-  const related = getProductsByCategory(category).filter((r) => r.slug !== p.slug).slice(0, 3)
+  const related = filterProductsByCategory(products, category).filter((r) => r.slug !== p.slug).slice(0, 3)
 
   return (
     <>

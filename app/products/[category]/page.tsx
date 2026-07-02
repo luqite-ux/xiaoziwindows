@@ -7,10 +7,19 @@ import { ProductsSidebar } from "@/components/products/products-sidebar"
 import { ProductCard } from "@/components/products/product-card"
 import { StaggerGroup, Reveal } from "@/components/motion/reveal"
 import { Button } from "@/components/ui/button"
-import { categories, getCategory, getProductsByCategory } from "@/lib/products"
+import {
+  fetchCategories,
+  fetchProducts,
+  findCategory,
+  filterProductsByCategory,
+} from "@/lib/products-db"
 
-export function generateStaticParams() {
-  return categories.map((c) => ({ category: c.slug }))
+export const revalidate = 60
+export const dynamicParams = true
+
+export async function generateStaticParams() {
+  const cats = await fetchCategories()
+  return cats.map((c) => ({ category: c.slug }))
 }
 
 export async function generateMetadata({
@@ -19,7 +28,8 @@ export async function generateMetadata({
   params: Promise<{ category: string }>
 }): Promise<Metadata> {
   const { category } = await params
-  const cat = getCategory(category)
+  const cats = await fetchCategories()
+  const cat = findCategory(cats, category)
   if (!cat) return {}
   return {
     title: cat.name,
@@ -33,10 +43,11 @@ export default async function CategoryPage({
   params: Promise<{ category: string }>
 }) {
   const { category } = await params
-  const cat = getCategory(category)
+  const [categories, products] = await Promise.all([fetchCategories(), fetchProducts()])
+  const cat = findCategory(categories, category)
   if (!cat) notFound()
 
-  const items = getProductsByCategory(category)
+  const items = filterProductsByCategory(products, category)
 
   return (
     <>
@@ -49,7 +60,7 @@ export default async function CategoryPage({
 
       <section className="bg-background py-12 sm:py-16">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 lg:grid-cols-[300px_1fr]">
-          <ProductsSidebar activeCategory={category} />
+          <ProductsSidebar activeCategory={category} categories={categories} products={products} />
 
           <div>
             <Reveal>

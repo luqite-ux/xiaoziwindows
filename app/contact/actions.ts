@@ -1,5 +1,7 @@
 "use server"
 
+import { submitInquiry } from "@/lib/submit-inquiry"
+
 export type RfqState = {
   status: "idle" | "success" | "error"
   message: string
@@ -31,21 +33,34 @@ export async function submitRfq(_prev: RfqState, formData: FormData): Promise<Rf
     return { status: "error", message: "Please correct the highlighted fields.", errors }
   }
 
-  // In production this would forward the enquiry to email / CRM / database.
-  // We log a structured summary so the submission is observable in the server logs.
-  console.log("[v0] New RFQ submission:", {
+  const drawingNote =
+    drawing && drawing.size > 0
+      ? `\n\n[Attached drawing: ${drawing.name} (${(drawing.size / 1024).toFixed(1)} KB) — please reply to this email to receive the file directly.]`
+      : ""
+
+  const bodyLines: string[] = []
+  if (company) bodyLines.push(`Company: ${company}`)
+  if (phone) bodyLines.push(`Phone: ${phone}`)
+  if (category) bodyLines.push(`Interested in: ${category}`)
+  if (quantity) bodyLines.push(`Quantity: ${quantity}`)
+  bodyLines.push("")
+  bodyLines.push(message)
+
+  const result = await submitInquiry({
     name,
     email,
-    phone,
-    company,
-    category,
-    quantity,
-    messageLength: message.length,
-    drawing: drawing && drawing.size > 0 ? { name: drawing.name, size: drawing.size } : null,
+    phone: phone || undefined,
+    company: company || undefined,
+    subject: category ? `RFQ: ${category}` : "RFQ",
+    message: bodyLines.join("\n") + drawingNote,
   })
 
-  // Simulate processing latency.
-  await new Promise((r) => setTimeout(r, 600))
+  if (!result.ok) {
+    return {
+      status: "error",
+      message: result.error || "Sorry, we couldn't submit your enquiry. Please try again or email us directly.",
+    }
+  }
 
   return {
     status: "success",

@@ -4,12 +4,25 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ChevronDown, Package } from "lucide-react"
 import { useState } from "react"
-import { categories, getProductsByCategory } from "@/lib/products"
+import {
+  categories as staticCategories,
+  products as staticProducts,
+  type Category,
+  type Product,
+} from "@/lib/products"
 import { cn } from "@/lib/utils"
 
-export function ProductsSidebar({ activeCategory }: { activeCategory?: string }) {
+type Props = {
+  activeCategory?: string
+  categories?: Category[]
+  products?: Product[]
+}
+
+export function ProductsSidebar({ activeCategory, categories, products }: Props) {
   const pathname = usePathname()
-  const [open, setOpen] = useState<string | null>(activeCategory ?? categories[0].slug)
+  const cats = categories && categories.length > 0 ? categories : staticCategories
+  const prods = products && products.length > 0 ? products : staticProducts
+  const [open, setOpen] = useState<string | null>(activeCategory ?? cats[0]?.slug ?? null)
 
   return (
     <aside className="lg:sticky lg:top-28">
@@ -19,8 +32,8 @@ export function ProductsSidebar({ activeCategory }: { activeCategory?: string })
           <h2 className="font-display text-base font-bold">Product Categories</h2>
         </div>
         <nav className="p-2">
-          {categories.map((cat) => {
-            const items = getProductsByCategory(cat.slug)
+          {cats.map((cat) => {
+            const items = prods.filter((p) => p.category === cat.slug)
             const isOpen = open === cat.slug
             const catActive = activeCategory === cat.slug
             return (

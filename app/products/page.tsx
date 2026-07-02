@@ -5,9 +5,10 @@ import { ArrowRight } from "lucide-react"
 import { PageHero } from "@/components/page-hero"
 import { ProductsSidebar } from "@/components/products/products-sidebar"
 import { ProductCard } from "@/components/products/product-card"
-import { SectionHeading } from "@/components/section-heading"
 import { StaggerGroup, Reveal } from "@/components/motion/reveal"
-import { categories, getProductsByCategory } from "@/lib/products"
+import { fetchCategories, fetchProducts, filterProductsByCategory } from "@/lib/products-db"
+
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: "Products",
@@ -15,7 +16,9 @@ export const metadata: Metadata = {
     "Browse XIAOZI's aluminum alloy windows and doors — casement, sliding and louver windows plus aluminum casement doors, all fully customizable in size, color, glazing and hardware.",
 }
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  const [categories, products] = await Promise.all([fetchCategories(), fetchProducts()])
+
   return (
     <>
       <PageHero
@@ -27,11 +30,11 @@ export default function ProductsPage() {
 
       <section className="bg-background py-12 sm:py-16">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 lg:grid-cols-[300px_1fr]">
-          <ProductsSidebar />
+          <ProductsSidebar categories={categories} products={products} />
 
           <div className="space-y-16">
             {categories.map((cat) => {
-              const items = getProductsByCategory(cat.slug)
+              const items = filterProductsByCategory(products, cat.slug)
               return (
                 <div key={cat.slug} id={cat.slug} className="scroll-mt-28">
                   <Reveal>
