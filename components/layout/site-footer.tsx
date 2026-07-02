@@ -2,9 +2,10 @@ import Link from "next/link"
 import Image from "next/image"
 import { MapPin, Phone, Mail, ChevronRight } from "lucide-react"
 import { navLinks, site } from "@/lib/site"
-import { categories } from "@/lib/products"
+import { categories as staticCategories, type Category } from "@/lib/products"
 
-export function SiteFooter() {
+export function SiteFooter({ categories }: { categories?: Category[] } = {}) {
+  const cats = categories && categories.length > 0 ? categories : staticCategories
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="mx-auto max-w-7xl px-6 py-14">
@@ -48,7 +49,7 @@ export function SiteFooter() {
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wide text-primary-foreground">Products</h3>
             <ul className="mt-4 space-y-2.5">
-              {categories.map((cat) => (
+              {cats.map((cat) => (
                 <li key={cat.slug}>
                   <Link
                     href={`/products/${cat.slug}`}

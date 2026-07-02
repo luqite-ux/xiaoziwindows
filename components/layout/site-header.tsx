@@ -7,11 +7,23 @@ import { usePathname } from "next/navigation"
 import { Menu, X, Phone, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { navLinks, site } from "@/lib/site"
-import { categories, getProductsByCategory } from "@/lib/products"
+import {
+  categories as staticCategories,
+  products as staticProducts,
+  type Category,
+  type Product,
+} from "@/lib/products"
 import { LanguageSwitcher } from "@/components/i18n/language-switcher"
 import { Button } from "@/components/ui/button"
 
-export function SiteHeader() {
+type Props = {
+  categories?: Category[]
+  products?: Product[]
+}
+
+export function SiteHeader({ categories, products }: Props = {}) {
+  const cats = categories && categories.length > 0 ? categories : staticCategories
+  const prods = products && products.length > 0 ? products : staticProducts
   const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -95,7 +107,7 @@ export function SiteHeader() {
                     >
                       {link.label}
                     </Link>
-                    <MegaMenu open={productsOpen} />
+                    <MegaMenu open={productsOpen} categories={cats} products={prods} />
                   </div>
                 )
               }
@@ -134,7 +146,7 @@ export function SiteHeader() {
         </div>
       </header>
 
-      <MobileNav open={mobileOpen} pathname={pathname} />
+      <MobileNav open={mobileOpen} pathname={pathname} categories={cats} />
     </>
   )
 }
@@ -148,7 +160,15 @@ function LanguageSwitcherWrapper() {
   )
 }
 
-function MegaMenu({ open }: { open: boolean }) {
+function MegaMenu({
+  open,
+  categories,
+  products,
+}: {
+  open: boolean
+  categories: Category[]
+  products: Product[]
+}) {
   return (
     <div
       className={cn(
@@ -176,7 +196,7 @@ function MegaMenu({ open }: { open: boolean }) {
                 </div>
               </Link>
               <ul className="mt-1 space-y-0.5 border-l border-border pl-3 ml-4">
-                {getProductsByCategory(cat.slug).map((p) => (
+                {products.filter((p) => p.category === cat.slug).map((p) => (
                   <li key={p.slug}>
                     <Link
                       href={`/products/${cat.slug}/${p.slug}`}
@@ -202,7 +222,15 @@ function MegaMenu({ open }: { open: boolean }) {
   )
 }
 
-function MobileNav({ open, pathname }: { open: boolean; pathname: string }) {
+function MobileNav({
+  open,
+  pathname,
+  categories,
+}: {
+  open: boolean
+  pathname: string
+  categories: Category[]
+}) {
   return (
     <div
       className={cn(

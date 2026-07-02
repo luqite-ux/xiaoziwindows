@@ -1,11 +1,12 @@
 import Link from "next/link"
 import Image from "next/image"
 import { ArrowUpRight } from "lucide-react"
-import { categories } from "@/lib/products"
+import { fetchCategories } from "@/lib/products-db"
 import { SectionHeading } from "@/components/section-heading"
 import { StaggerGroup, StaggerItem } from "@/components/motion/reveal"
 
-export function CategoryShowcase() {
+export async function CategoryShowcase() {
+  const categories = await fetchCategories()
   return (
     <section className="bg-background py-20 sm:py-24">
       <div className="mx-auto max-w-7xl px-6">

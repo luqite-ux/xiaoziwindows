@@ -4,6 +4,9 @@ import { PageHero } from "@/components/page-hero"
 import { RfqForm } from "@/components/contact/rfq-form"
 import { Reveal } from "@/components/motion/reveal"
 import { site } from "@/lib/site"
+import { fetchCategories } from "@/lib/products-db"
+
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: "Contact & Request a Quote",
@@ -18,7 +21,8 @@ const details = [
   { icon: Clock, label: "Business hours", value: "Mon – Sat, 9:00 – 18:00 (GMT+8)" },
 ]
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const categories = await fetchCategories()
   return (
     <>
       <PageHero
@@ -68,7 +72,7 @@ export default function ContactPage() {
 
           {/* Form column */}
           <Reveal delay={0.1}>
-            <RfqForm />
+            <RfqForm categories={categories} />
           </Reveal>
         </div>
       </section>

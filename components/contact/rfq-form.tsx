@@ -4,7 +4,7 @@ import { useActionState, useRef, useState } from "react"
 import { useFormStatus } from "react-dom"
 import { CheckCircle2, Upload, X, Send, AlertCircle } from "lucide-react"
 import { submitRfq, type RfqState } from "@/app/contact/actions"
-import { categories } from "@/lib/products"
+import { categories as staticCategories, type Category } from "@/lib/products"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -34,7 +34,8 @@ function SubmitButton() {
   )
 }
 
-export function RfqForm() {
+export function RfqForm({ categories }: { categories?: Category[] } = {}) {
+  const cats = categories && categories.length > 0 ? categories : staticCategories
   const [state, formAction] = useActionState(submitRfq, initialState)
   const [fileName, setFileName] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -85,7 +86,7 @@ export function RfqForm() {
             className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm outline-none focus-visible:ring-1 focus-visible:ring-ring"
           >
             <option value="">Select a category</option>
-            {categories.map((c) => (
+            {cats.map((c) => (
               <option key={c.slug} value={c.shortName}>
                 {c.shortName}
               </option>

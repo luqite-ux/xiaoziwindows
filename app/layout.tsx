@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/layout/site-header"
 import { SiteFooter } from "@/components/layout/site-footer"
 import { GoogleTranslate } from "@/components/i18n/google-translate"
 import { site } from "@/lib/site"
+import { fetchCategories, fetchProducts } from "@/lib/products-db"
 import "./globals.css"
 
 const manrope = Manrope({
@@ -70,16 +71,18 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const [categories, products] = await Promise.all([fetchCategories(), fetchProducts()])
+
   return (
     <html lang="en" className={`bg-background ${manrope.variable} ${inter.variable}`}>
       <body className="font-sans antialiased">
         <Suspense fallback={null}>
           <GoogleTranslate />
         </Suspense>
-        <SiteHeader />
+        <SiteHeader categories={categories} products={products} />
         <main className="min-h-screen">{children}</main>
-        <SiteFooter />
+        <SiteFooter categories={categories} />
         <Analytics />
       </body>
     </html>

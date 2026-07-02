@@ -6,6 +6,8 @@ import { ProcessSection } from "@/components/home/process-section"
 import { CtaSection } from "@/components/home/cta-section"
 import { site } from "@/lib/site"
 
+export const revalidate = 60
+
 export default function HomePage() {
   return (
     <>
