@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 
 const slides = [
   {
-    image: "/images/products/aluminum-casement-window/01.webp",
+    image: "/images/hero/1.webp",
     eyebrow: "Aluminum Doors & Windows Manufacturer",
     title: "Engineering daylight, security and comfort",
     text: "6063-T5 aluminum casement, sliding and louver windows plus aluminum doors — designed, manufactured and installed under one roof in Shanghai.",
@@ -17,7 +17,7 @@ const slides = [
     secondary: { label: "Request a Quote", href: "/contact" },
   },
   {
-    image: "/images/hero-manufacturing.png",
+    image: "/images/hero/2.webp",
     eyebrow: "In-house Production Base",
     title: "Precision fabrication you can rely on",
     text: "A 12,000㎡ production base with CNC machining and strict QC delivers consistent quality at scale, project after project.",
@@ -25,7 +25,7 @@ const slides = [
     secondary: { label: "Get a Quote", href: "/contact" },
   },
   {
-    image: "/images/hero-installation.png",
+    image: "/images/hero/3.webp",
     eyebrow: "One-stop Engineering Service",
     title: "From drawing to installation",
     text: "R&D, custom production, sales, delivery and on-site installation — a complete solution for residential, commercial and industrial projects.",
